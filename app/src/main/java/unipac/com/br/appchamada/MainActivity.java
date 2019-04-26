@@ -9,62 +9,76 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import unipac.com.br.appchamada.domain.Aluno;
+import unipac.com.br.appchamada.util.SecurityPreferences;
+
 public class MainActivity extends AppCompatActivity {
-    EditText nomeEdt, emailEdt, telefoneEdt;
-    Button salvarBtn;
+
+    private ViewHolder viewHolder = new ViewHolder();
+    private SecurityPreferences securityPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        nomeEdt = (EditText) findViewById(R.id.nomeEdt);
-        emailEdt = (EditText) findViewById(R.id.emailEdt);
-        telefoneEdt = (EditText) findViewById(R.id.telefoneEdt);
-        salvarBtn = (Button) findViewById(R.id.salvarBtn);
+        securityPreferences = new SecurityPreferences(this);
 
-        salvarBtn.setOnClickListener(new View.OnClickListener() {
+        this.viewHolder.nomeEdt = (EditText) findViewById(R.id.nomeEdt);
+        this.viewHolder.emailEdt = (EditText) findViewById(R.id.emailEdt);
+        this.viewHolder.telefoneEdt = (EditText) findViewById(R.id.telefoneEdt);
+        this.viewHolder.salvarBtn = (Button) findViewById(R.id.salvarBtn);
+
+        this.viewHolder.salvarBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String nome = nomeEdt.getText().toString();
-                String email = emailEdt.getText().toString();
-                String telefone = emailEdt.getText().toString();
+                String nome = MainActivity.this.viewHolder.nomeEdt.getText().toString();
+                String email = MainActivity.this.viewHolder.emailEdt.getText().toString();
+                String telefone = MainActivity.this.viewHolder.telefoneEdt.getText().toString();
 
-                insereInformacao(nome, email, telefone);
+                Aluno aluno = criaAluno(nome, email, telefone);
+                insereInformacao(aluno);
             }
         });
     }
 
-    public void insereInformacao(String nome, String email, String telefone){
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString("NOME", nome);
-        editor.putString("EMAIL", email);
-        editor.putString("TELEFONE", telefone);
-
-        editor.commit();
-
+    public void insereInformacao(Aluno aluno){
+        securityPreferences.guardaString("NOME", aluno.getNome());
+        securityPreferences.guardaString("EMAIL", aluno.getEmail());
+        securityPreferences.guardaString("TELEFONE", aluno.getTelefone());
     }
 
     public void lerDados() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        String nome = securityPreferences.recuperaString("NOME");
+        String email = securityPreferences.recuperaString("EMAIL");
+        String telefone = securityPreferences.recuperaString("TELEFONE");
 
-        String nome = preferences.getString("NOME", "Retornou Nada");
-        String email = preferences.getString("EMAIL", "Retornou Nada");
-        String telefone = preferences.getString("TELEFONE", "Retornou Nada");
-
-        imprime(nome, email, telefone);
+        Aluno aluno = criaAluno(nome, email, telefone);
+        imprime(aluno);
     }
 
-    public void imprime(String nome, String email, String telefone) {
+    public void imprime(Aluno aluno) {
         StringBuilder sb = new StringBuilder(1200);
         sb.append("Os dados cadastrados Foram:");
-        sb.append("Nome: " + nome);
-        sb.append("e-mail" + email);
-        sb.append("telefone" + telefone);
+        sb.append("Nome: " + aluno.getNome());
+        sb.append("e-mail" + aluno.getEmail());
+        sb.append("telefone" + aluno.getTelefone());
 
         Toast.makeText(MainActivity.this, sb.toString(), Toast.LENGTH_LONG).show();
+    }
+
+    public static class ViewHolder {
+        EditText nomeEdt;
+        EditText emailEdt;
+        EditText telefoneEdt;
+        Button salvarBtn;
+    }
+
+    private Aluno criaAluno(String nome, String email, String telefone) {
+        Aluno aluno = new Aluno();
+        aluno.setNome(nome);
+        aluno.setEmail(email);
+        aluno.setTelefone(telefone);
+        return aluno;
     }
 }
