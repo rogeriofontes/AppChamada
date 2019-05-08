@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import unipac.com.br.appchamada.dao.AlunoDAO;
 import unipac.com.br.appchamada.domain.Aluno;
 import unipac.com.br.appchamada.util.SecurityPreferences;
 
@@ -16,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewHolder viewHolder = new ViewHolder();
     private SecurityPreferences securityPreferences;
+
+    private AlunoDAO alunoDAO = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
         this.viewHolder.emailEdt = (EditText) findViewById(R.id.emailEdt);
         this.viewHolder.telefoneEdt = (EditText) findViewById(R.id.telefoneEdt);
         this.viewHolder.salvarBtn = (Button) findViewById(R.id.salvarBtn);
+
+        alunoDAO = new AlunoDAO(this);
 
         this.viewHolder.salvarBtn.setOnClickListener(new View.OnClickListener() {
             @Override
