@@ -9,6 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.List;
+
+import unipac.com.br.appchamada.api.HttpGetRequest;
 import unipac.com.br.appchamada.dao.AlunoDAO;
 import unipac.com.br.appchamada.domain.Aluno;
 import unipac.com.br.appchamada.util.SecurityPreferences;
@@ -37,14 +40,36 @@ public class MainActivity extends AppCompatActivity {
         this.viewHolder.salvarBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //new HttpGetRequest().execute(); //Integracao com WebService
                 String nome = MainActivity.this.viewHolder.nomeEdt.getText().toString();
                 String email = MainActivity.this.viewHolder.emailEdt.getText().toString();
                 String telefone = MainActivity.this.viewHolder.telefoneEdt.getText().toString();
 
                 Aluno aluno = criaAluno(nome, email, telefone);
-                insereInformacao(aluno);
-            }
+                insereInformacaoNoSQLite(aluno);
+
+                lerDadosSQLite();
+             }
         });
+    }
+
+    public void insereInformacaoNoSQLite(Aluno aluno){
+        alunoDAO.salvar(aluno);
+    }
+
+    public void buscarInformacaoNoSQLite(long id){
+        alunoDAO.buscarPorId(id);
+    }
+
+    public List<Aluno> buscarInformacaoNoSQLite(){
+       return alunoDAO.buscarTodos();
+    }
+
+    public void lerDadosSQLite() {
+        List<Aluno> alunos = buscarInformacaoNoSQLite();
+        for(Aluno aluno: alunos){
+            Toast.makeText(MainActivity.this, "Aluno" + aluno.toString(), Toast.LENGTH_LONG).show();
+        }
     }
 
     public void insereInformacao(Aluno aluno){
